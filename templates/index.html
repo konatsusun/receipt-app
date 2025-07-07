@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>レシートリマインダー</title>
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <meta name="theme-color" content="#ff69b4">
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #fff0f5;
+      display: flex;
+      justify-content: center;
+      padding: 30px;
+    }
+    .container {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 30px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 1em;
+    }
+    button {
+      background: #2d38fc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      margin: 5px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+    textarea {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 1em;
+    }
+    .info {
+      text-align: left;
+      margin-top: 1em;
+      font-size: 0.9em;
+    }
+    .link-button {
+      margin-top: 2em;
+      display: inline-block;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>📷 レシートリマインダー</h1>
+
+  <!-- 💙 ここからフォーム -->
+  <form method="POST" enctype="multipart/form-data">
+
+    <!-- 📸 レシート画像アップ -->
+    <p>📸 レシートの写真を撮る：</p>
+    <input type="file" name="receipt" accept="image/*" capture="environment"><br><br>
+
+    <!-- 🎤 音声メモ -->
+    <p>🎤 音声メモ（任意）</p>
+    <button type="button" onclick="startSpeech()">録音スタート</button>
+    <button type="button" onclick="stopSpeech()">ストップ</button>
+    <textarea id="note" name="note" rows="4" placeholder="ここにメモが表示されるよ〜"></textarea>
+
+    <!-- 📍住所をフォームで送るための非表示input -->
+    <input type="hidden" name="location_text" id="location_text">
+
+
+    <!-- 📍位置情報 + 時刻 -->
+    <div class="info">
+      <p>📍 現在地：<span id="location">取得中...</span></p>
+      <p>🕒 時刻：<span id="timestamp">取得中...</span></p>
+    </div>
+
+    <!-- 📤 送信ボタン -->
+    <button type="submit">📤 送信する</button>
+
+  </form>
+  <!-- 💙 フォームここまで -->
+
+  <!-- 📋 記録一覧リンク -->
+  <a href="/records" class="link-button"><button type="button">📋 記録一覧を見る</button></a>
+</div>
+
+  <script>
+    // 🎤 音声認識
+    let recognition;
+    function startSpeech() {
+      recognition = new webkitSpeechRecognition();
+      recognition.lang = "ja-JP";
+      recognition.onresult = function (event) {
+        document.getElementById("note").value = event.results[0][0].transcript;
+      };
+      recognition.start();
+    }
+    function stopSpeech() {
+      if (recognition) recognition.stop();
+    }
+
+navigator.geolocation.getCurrentPosition(function (position) {
+  const lat = position.coords.latitude;
+  const lon = position.coords.longitude;
+
+  const apiKey = 'caa87e702ff14e83aca4e733f246be02'; // OpenCageのAPIキーをここに！
+  const url = `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=${apiKey}&language=ja`;
+
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      const result = data.results[0];
+      const components = result.components;
+
+      // 市区町村の組み立て（あるものだけ使う）
+      const prefecture = components.state || '';
+      const city = components.city || components.town || '';
+      const area = components.suburb || components.neighbourhood || '';
+      const locationText = `${prefecture} ${city} ${area}`.trim();
+
+      document.getElementById("location").innerText = locationText;
+      document.getElementById("location_text").value = locationText; // ←これ追加！
+
+    })
+    .catch(error => {
+      document.getElementById("location").innerText = "住所の取得に失敗しました🥺";
+      console.error("ジオコーディング失敗:", error);
+    });
+});
+
+    // 🕒 タイムスタンプ
+    const now = new Date();
+    const formatted = now.toLocaleString("ja-JP", {
+      year: "numeric", month: "long", day: "numeric",
+      hour: "2-digit", minute: "2-digit"
+    });
+    document.getElementById("timestamp").innerText = formatted;
+    
+  </script>
+</body>
+</html>
