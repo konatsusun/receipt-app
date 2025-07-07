@@ -5,61 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>レシートリマインダー</title>
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=999"> <!-- ✅ これだけ -->
   <meta name="theme-color" content="#ff69b4">
-  <style>
-    body {
-      font-family: sans-serif;
-      background-color: #fff0f5;
-      display: flex;
-      justify-content: center;
-      padding: 30px;
-    }
-    .container {
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      padding: 30px;
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-    }
-    h1 {
-      font-size: 1.8em;
-      margin-bottom: 1em;
-    }
-    button {
-      background: #2d38fc;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 20px;
-      margin: 5px;
-      font-size: 1em;
-      cursor: pointer;
-    }
-    button:hover {
-      opacity: 0.8;
-    }
-    textarea {
-      width: 100%;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 1em;
-    }
-    .info {
-      text-align: left;
-      margin-top: 1em;
-      font-size: 0.9em;
-    }
-    .link-button {
-      margin-top: 2em;
-      display: inline-block;
-      text-decoration: none;
-    }
-  </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -69,8 +18,15 @@
   <form method="POST" enctype="multipart/form-data">
 
     <!-- 📸 レシート画像アップ -->
+    <!-- <p>📸 レシートの写真を撮る：</p>
+    <input type="file" name="receipt" accept="image/*" capture="environment"><br><br> -->
+
     <p>📸 レシートの写真を撮る：</p>
-    <input type="file" name="receipt" accept="image/*" capture="environment"><br><br>
+
+    <!-- inputは非表示にして、labelをボタンにする -->
+    <input type="file" name="receipt" accept="image/*" capture="environment" id="receiptInput" style="display: none;">
+    <label for="receiptInput" class="upload-label">📷 写真を選ぶ / 撮る</label>
+
 
     <!-- 🎤 音声メモ -->
     <!-- <p>🎤 音声メモ（任意）</p>
