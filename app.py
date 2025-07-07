@@ -90,3 +90,22 @@ if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=port)
+
+
+
+# 🔧 一時的にここでテーブルを作る！
+import sqlite3
+conn = sqlite3.connect('records.db')
+c = conn.cursor()
+c.execute('''
+CREATE TABLE IF NOT EXISTS records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT,
+    note TEXT,
+    location TEXT,
+    image_filename TEXT,
+    checked INTEGER
+)
+''')
+conn.commit()
+conn.close()
