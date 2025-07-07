@@ -73,9 +73,11 @@
     <input type="file" name="receipt" accept="image/*" capture="environment"><br><br>
 
     <!-- 🎤 音声メモ -->
-    <p>🎤 音声メモ（任意）</p>
+    <!-- <p>🎤 音声メモ（任意）</p>
     <button type="button" onclick="startSpeech()">録音スタート</button>
-    <button type="button" onclick="stopSpeech()">ストップ</button>
+    <button type="button" onclick="stopSpeech()">ストップ</button> -->
+
+    <!-- メモ欄 -->
     <textarea id="note" name="note" rows="4" placeholder="ここにメモが表示されるよ〜"></textarea>
 
     <!-- 📍住所をフォームで送るための非表示input -->
@@ -100,18 +102,19 @@
 
   <script>
     // 🎤 音声認識
-    let recognition;
-    function startSpeech() {
-      recognition = new webkitSpeechRecognition();
-      recognition.lang = "ja-JP";
-      recognition.onresult = function (event) {
-        document.getElementById("note").value = event.results[0][0].transcript;
-      };
-      recognition.start();
-    }
-    function stopSpeech() {
-      if (recognition) recognition.stop();
-    }
+    // let recognition;
+    // function startSpeech() {
+    //   recognition = new webkitSpeechRecognition();
+    //   recognition.lang = "ja-JP";
+    //   recognition.onresult = function (event) {
+    //     document.getElementById("note").value = event.results[0][0].transcript;
+    //   };
+    //   recognition.start();
+    // }
+    // function stopSpeech() {
+    //   if (recognition) recognition.stop();
+    // }
+
 
 navigator.geolocation.getCurrentPosition(function (position) {
   const lat = position.coords.latitude;
