@@ -4,13 +4,21 @@ import sqlite3
 from datetime import datetime
 import cloudinary
 import cloudinary.uploader
+from google.oauth2 import service_account
+import gspread
 
 # ✅ Cloudinaryの設定
 cloudinary.config(
     cloud_name='dl7v7s9i2',
     api_key='346984834479876',
-    api_secret='CNXbvclq0Vta2O7mAr9IcFh3o2I'  # ← ここを忘れずに！
+    api_secret='CNXbvclq0Vta2O7mAr9IcFh3o2I'
 )
+
+# ✅ Google Sheets 認証とシート設定
+creds = service_account.Credentials.from_service_account_file("credentials.json")
+gc = gspread.authorize(creds)
+spreadsheet = gc.open("レシートリマインダー")
+worksheet = spreadsheet.sheet1
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.jinja_env.cache = {}
@@ -25,6 +33,9 @@ def insert_record(timestamp, note, location, image_url):
               (timestamp, note, location, image_url, 0))
     conn.commit()
     conn.close()
+
+    # 🔸 Google Sheets にも追加
+    worksheet.append_row([timestamp, note, location, image_url or '', "❌"])
 
 # 🔹 DBの全データを取得する関数
 def get_all_records():
@@ -46,20 +57,16 @@ def mark_as_checked(record_id):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # 📷 レシート画像
         file = request.files.get('receipt')
         image_url = None
         if file and file.filename:
-            # CloudinaryにアップロードしてURLを取得
             result = cloudinary.uploader.upload(file)
             image_url = result['secure_url']
 
-        # 🎤 メモと 📍 住所
         note = request.form.get('note')
         location = request.form.get('location_text')
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        # 💾 DBに保存！
         insert_record(timestamp, note, location, image_url)
 
         return redirect('/')
@@ -90,20 +97,16 @@ def sw():
 @app.route('/admin')
 def admin_page():
     records = get_all_records()
-    # 経理用のHTMLテンプレートで表示させる
     return render_template('admin.html', records=records)
 
 @app.route('/delete/<int:record_id>', methods=['POST'])
 def delete_record(record_id):
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-    # チェック済みでない（checked = 0）ものだけ削除
     c.execute('DELETE FROM records WHERE id = ? AND checked = 0', (record_id,))
     conn.commit()
     conn.close()
     return redirect('/admin')
-
-
 
 # 🔧 DBテーブルを作る（なければ）
 conn = sqlite3.connect(DB_NAME)
