@@ -87,6 +87,13 @@ def check(record_id):
 def sw():
     return app.send_static_file('service-worker.js')
 
+@app.route('/admin')
+def admin_page():
+    records = get_all_records()
+    # 経理用のHTMLテンプレートで表示させる
+    return render_template('admin.html', records=records)
+
+
 
 # 🔧 DBテーブルを作る（なければ）
 conn = sqlite3.connect(DB_NAME)
