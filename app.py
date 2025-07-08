@@ -2,22 +2,27 @@ from flask import Flask, request, render_template, redirect
 import os
 import sqlite3
 from datetime import datetime
+import cloudinary
+import cloudinary.uploader
+
+# ✅ Cloudinaryの設定
+cloudinary.config(
+    cloud_name='d17v7s9zi2',
+    api_key='746940474970761',
+    api_secret='CNXbvclq0Vta2O7mAr9IcFh3o2I'  # ← ここを忘れずに！
+)
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.jinja_env.cache = {}
 
-
-UPLOAD_FOLDER = os.path.join('static', 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 DB_NAME = 'records.db'
 
 # 🔹 DBにデータを追加する関数
-def insert_record(timestamp, note, location, filename):
+def insert_record(timestamp, note, location, image_url):
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
     c.execute('INSERT INTO records (timestamp, note, location, image_filename, checked) VALUES (?, ?, ?, ?, ?)',
-              (timestamp, note, location, filename, 0))
+              (timestamp, note, location, image_url, 0))
     conn.commit()
     conn.close()
 
@@ -43,11 +48,11 @@ def index():
     if request.method == 'POST':
         # 📷 レシート画像
         file = request.files.get('receipt')
-        filename = None
+        image_url = None
         if file and file.filename:
-            timestamp_str = datetime.now().strftime('%Y%m%d%H%M%S')
-            filename = f"{timestamp_str}_{file.filename}"
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
+            # CloudinaryにアップロードしてURLを取得
+            result = cloudinary.uploader.upload(file)
+            image_url = result['secure_url']
 
         # 🎤 メモと 📍 住所
         note = request.form.get('note')
@@ -55,7 +60,7 @@ def index():
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         # 💾 DBに保存！
-        insert_record(timestamp, note, location, filename)
+        insert_record(timestamp, note, location, image_url)
 
         return redirect('/')
 
@@ -68,7 +73,7 @@ def records():
     for row in records:
         id, timestamp, note, location, image_filename, checked = row
         check_button = "✅ 済" if checked else f"<a href='/check/{id}'><button>確認</button></a>"
-        image_html = f"<a href='/static/uploads/{image_filename}' target='_blank'>📷</a>" if image_filename else "-"
+        image_html = f"<a href='{image_filename}' target='_blank'>📷</a>" if image_filename else "-"
         html += f"<tr><td>{id}</td><td>{timestamp}</td><td>{location}</td><td>{note}</td><td>{image_html}</td><td>{check_button}</td></tr>"
     html += "</table><br><a href='/'>← フォームに戻る</a>"
     return html
@@ -83,9 +88,8 @@ def sw():
     return app.send_static_file('service-worker.js')
 
 
-# 🔧 一時的にここでテーブルを作る！
-import sqlite3
-conn = sqlite3.connect('records.db')
+# 🔧 DBテーブルを作る（なければ）
+conn = sqlite3.connect(DB_NAME)
 c = conn.cursor()
 c.execute('''
 CREATE TABLE IF NOT EXISTS records (
@@ -100,15 +104,7 @@ CREATE TABLE IF NOT EXISTS records (
 conn.commit()
 conn.close()
 
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
-# render用に変更
+# Render対応
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=port)
-
-
-
