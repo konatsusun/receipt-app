@@ -18,7 +18,10 @@ cloudinary.config(
 CREDENTIALS_PATH = "/etc/secrets/credentials.json" if os.path.exists("/etc/secrets/credentials.json") else "credentials.json"
 
 # ✅ スプレッドシート操作のスコープを指定！
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+SCOPES = [
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive'
+]
 
 # ✅ Google Sheets 認証
 creds = service_account.Credentials.from_service_account_file(
