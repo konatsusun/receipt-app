@@ -7,8 +7,8 @@ import cloudinary.uploader
 
 # ✅ Cloudinaryの設定
 cloudinary.config(
-    cloud_name='d17v7s9zi2',
-    api_key='746940474970761',
+    cloud_name='dl7v7s9i2',
+    api_key='346984834479876',
     api_secret='CNXbvclq0Vta2O7mAr9IcFh3o2I'  # ← ここを忘れずに！
 )
 
