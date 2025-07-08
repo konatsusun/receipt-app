@@ -82,16 +82,6 @@ def check(record_id):
 def sw():
     return app.send_static_file('service-worker.js')
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
-# render用に変更
-if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, host="0.0.0.0", port=port)
-
-
 
 # 🔧 一時的にここでテーブルを作る！
 import sqlite3
@@ -109,3 +99,16 @@ CREATE TABLE IF NOT EXISTS records (
 ''')
 conn.commit()
 conn.close()
+
+
+# if __name__ == '__main__':
+#     app.run(debug=True)
+
+# render用に変更
+if __name__ == "__main__":
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=True, host="0.0.0.0", port=port)
+
+
+
