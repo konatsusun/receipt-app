@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>💼 経理ちゃんの管理ページ</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #fffafc;
+      color: #333;
+      padding: 20px;
+    }
+    h2 {
+      color: #d63384;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #ffe0f0;
+    }
+    .checked {
+      color: green;
+      font-weight: bold;
+    }
+    .not-checked button {
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      color: #007bff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>📋 経理ちゃんの提出チェックページ💖</h2>
+
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>日時</th>
+      <th>住所</th>
+      <th>メモ</th>
+      <th>画像</th>
+      <th>状態</th>
+    </tr>
+    {% for record in records %}
+    <tr>
+      <td>{{ record[0] }}</td>
+      <td>{{ record[1] }}</td>
+      <td>{{ record[3] }}</td>
+      <td>{{ record[2] }}</td>
+      <td>
+        {% if record[4] %}
+          <a href="{{ record[4] }}" target="_blank">📷 見る</a>
+        {% else %}
+          -
+        {% endif %}
+      </td>
+      <td>
+        {% if record[5] == 1 %}
+          <span class="checked">✅ 済</span>
+        {% else %}
+          <span class="not-checked">
+            <a href="/check/{{ record[0] }}"><button>確認</button></a>
+          </span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <a class="back-link" href="/">← 社長の提出ページへ戻る</a>
+</body>
+</html>
