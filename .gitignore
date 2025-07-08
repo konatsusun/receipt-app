@@ -1,0 +1,4 @@
+__pycache__/
+records.db
+uploads/
+credentials.json

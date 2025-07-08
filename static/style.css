@@ -1,0 +1,87 @@
+/* 全体の背景とフォント */
+body {
+  font-family: sans-serif;
+  background-color: #fff0f5;
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
+
+/* 中央のカード */
+.container {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  padding: 30px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* タイトル */
+h1 {
+  font-size: 1.8em;
+  margin-bottom: 1em;
+}
+
+/* 通常ボタン */
+button {
+  background: #2d38fc;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  margin: 5px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+/* ボタンホバー */
+button:hover {
+  opacity: 0.8;
+}
+
+/* テキストエリア（メモ） */
+textarea {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 1em;
+}
+
+/* 位置情報・時刻表示 */
+.info {
+  text-align: left;
+  margin-top: 1em;
+  font-size: 0.9em;
+}
+
+/* 一覧ボタン */
+.link-button {
+  margin-top: 2em;
+  display: inline-block;
+  text-decoration: none;
+}
+
+/* 🎯 レシートアップロードボタン */
+.upload-label {
+  display: inline-block;
+  background-color: #2d38fc !important; /* ネイビー系カラー */
+  color: white !important;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 1em !important;
+  cursor: pointer;
+  margin-top: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: 0.3s;
+}
+
+/* アップロードボタンのホバー */
+.upload-label:hover {
+  background-color: #1e1f3c !important;
+  transform: scale(1.03);
+}
+

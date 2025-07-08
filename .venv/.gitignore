@@ -1,0 +1,11 @@
+# Created by venv; see https://docs.python.org/3/library/venv.html
+
+# 仮想環境を無視
+.venv/
+
+# 機密ファイルを無視
+credentials.json
+
+# Pythonキャッシュを無視
+__pycache__/
+*.pyc
