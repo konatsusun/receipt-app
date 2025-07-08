@@ -93,6 +93,16 @@ def admin_page():
     # 経理用のHTMLテンプレートで表示させる
     return render_template('admin.html', records=records)
 
+@app.route('/delete/<int:record_id>', methods=['POST'])
+def delete_record(record_id):
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    # チェック済みでない（checked = 0）ものだけ削除
+    c.execute('DELETE FROM records WHERE id = ? AND checked = 0', (record_id,))
+    conn.commit()
+    conn.close()
+    return redirect('/admin')
+
 
 
 # 🔧 DBテーブルを作る（なければ）

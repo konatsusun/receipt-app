@@ -71,15 +71,20 @@
           -
         {% endif %}
       </td>
+
       <td>
         {% if record[5] == 1 %}
           <span class="checked">✅ 済</span>
         {% else %}
           <span class="not-checked">
             <a href="/check/{{ record[0] }}"><button>確認</button></a>
+            <form action="/delete/{{ record[0] }}" method="post" style="display:inline;">
+              <button type="submit" onclick="return confirm('本当に削除しますか？');">🗑 削除</button>
+            </form>
           </span>
         {% endif %}
       </td>
+      
     </tr>
     {% endfor %}
   </table>
