@@ -17,8 +17,14 @@ cloudinary.config(
 # ✅ credentials.json の場所を自動で判定（Render or ローカル）
 CREDENTIALS_PATH = "/etc/secrets/credentials.json" if os.path.exists("/etc/secrets/credentials.json") else "credentials.json"
 
+# ✅ スプレッドシート操作のスコープを指定！
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+
 # ✅ Google Sheets 認証
-creds = service_account.Credentials.from_service_account_file(CREDENTIALS_PATH)
+creds = service_account.Credentials.from_service_account_file(
+    CREDENTIALS_PATH,
+    scopes=SCOPES
+)
 gc = gspread.authorize(creds)
 
 # ✅ スプレッドシートに接続
