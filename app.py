@@ -170,6 +170,12 @@ CREATE TABLE IF NOT EXISTS records (
 conn.commit()
 conn.close()
 
+#送信後に完了表示ファイルを読み込み 
+@app.route("/submit")
+def submit():
+    return render_template("submit.html")
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=port)
