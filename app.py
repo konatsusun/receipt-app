@@ -45,11 +45,12 @@ def insert_record(timestamp, note, location, image_url):
     c = conn.cursor()
     c.execute('INSERT INTO records (timestamp, note, location, image_filename, checked) VALUES (?, ?, ?, ?, ?)',
               (timestamp, note, location, image_url, 0))
+    record_id = c.lastrowid  # ← 挿入した行のIDを取得
     conn.commit()
     conn.close()
 
-    # 🔸 Google Sheets にも追加
-    worksheet.append_row([timestamp, note, location, image_url or '', "❌"])
+    # 🔸 Google Sheets（idも含める） にも追加
+    worksheet.append_row([record_id, timestamp, note, location, image_url or '', "❌"])
 
 # 🔹 DBの全データを取得する関数
 def get_all_records():
@@ -67,6 +68,15 @@ def mark_as_checked(record_id):
     c.execute('UPDATE records SET checked = 1 WHERE id = ?', (record_id,))
     conn.commit()
     conn.close()
+
+    # 🔍 スプレッドシート内からidの行を探して状態を更新
+    try:
+        cell = worksheet.find(str(record_id))  # idを検索（A列）
+        if cell:
+            row = cell.row
+            worksheet.update_cell(row, 6, "✅")  # F列（状態）を更新
+    except Exception as e:
+        print("スプレッドシート更新失敗:", e)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
