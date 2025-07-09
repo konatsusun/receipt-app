@@ -99,10 +99,11 @@ def records():
         delete_button = ""
         if not checked:
             delete_button = f"""
-              <form action='/delete-sheet-row/{id + 1}' method='post' onsubmit="return confirm('本当に削除しますか？');">
+              <form action='/delete/{id}' method='post' onsubmit="return confirm('本当に削除しますか？');" style="display:inline;">
                 <button type='submit'>🗑️ 削除</button>
               </form>
             """
+
 
         html += f"<tr><td>{id}</td><td>{timestamp}</td><td>{location}</td><td>{note}</td><td>{image_html}</td><td>{check_button}{delete_button}</td></tr>"
     html += "</table><br><a href='/'>← フォームに戻る</a>"
