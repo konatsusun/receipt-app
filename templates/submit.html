@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>領収書提出</title>
+  <style>
+    #successMessage {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #d4edda;
+      color: #155724;
+      padding: 15px 30px;
+      border: 2px solid #c3e6cb;
+      border-radius: 8px;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📸 領収書の提出</h1>
+
+  <input type="file" id="receiptInput" required>
+  <button id="submitBtn">送信</button>
+
+  <div id="successMessage">✅ 送信が完了しました！</div>
+
+  <script>
+    document.getElementById("submitBtn").addEventListener("click", function () {
+      const fileInput = document.getElementById("receiptInput");
+      if (!fileInput.value) {
+        alert("ファイルを選択してください");
+        return;
+      }
+
+      // フェイク送信処理
+      setTimeout(function () {
+        const msg = document.getElementById("successMessage");
+        msg.style.display = "block";
+
+        setTimeout(function () {
+          msg.style.display = "none";
+        }, 2000);
+      }, 500);
+    });
+  </script>
+
+</body>
+</html>
