@@ -4,9 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>レシートリマインダー</title>
+
+  <!-- PWA manifest -->
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=999"> <!-- ✅ これだけ -->
   <meta name="theme-color" content="#ff69b4">
+
+  <!-- iOS用 -->
+  <link rel="apple-touch-icon" href="/static/icon.png"> <!-- 192x192 PNGでOK -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=999">
+
+  <!-- Service Worker 登録 -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(reg => console.log("SW registered ✅", reg))
+        .catch(err => console.error("SW failed ❌", err));
+    }
+  </script>
 </head>
 
 <body>
