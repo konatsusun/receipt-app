@@ -45,18 +45,15 @@ def insert_record(timestamp, note, location, image_url):
     c = conn.cursor()
     c.execute('INSERT INTO records (timestamp, note, location, image_filename, checked) VALUES (?, ?, ?, ?, ?)',
               (timestamp, note, location, image_url, 0))
-    record_id = c.lastrowid  # ← 挿入した行のIDを取得
     conn.commit()
     conn.close()
+    worksheet.append_row([timestamp, note, location, image_url or '', "❌"])
 
-    # 🔸 Google Sheets（idも含める） にも追加
-    worksheet.append_row([record_id, timestamp, note, location, image_url or '', "❌"])
-
-# 🔹 DBの全データを取得する関数
-def get_all_records():
+# 🔹 未確認のDBレコードのみ取得
+def get_unchecked_records():
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-    c.execute('SELECT id, timestamp, note, location, image_filename, checked FROM records ORDER BY id DESC')
+    c.execute('SELECT id, timestamp, note, location, image_filename, checked FROM records WHERE checked = 0 ORDER BY id DESC')
     rows = c.fetchall()
     conn.close()
     return rows
@@ -68,15 +65,6 @@ def mark_as_checked(record_id):
     c.execute('UPDATE records SET checked = 1 WHERE id = ?', (record_id,))
     conn.commit()
     conn.close()
-
-    # 🔍 スプレッドシート内からidの行を探して状態を更新
-    try:
-        cell = worksheet.find(str(record_id))  # idを検索（A列）
-        if cell:
-            row = cell.row
-            worksheet.update_cell(row, 6, "✅")  # F列（状態）を更新
-    except Exception as e:
-        print("スプレッドシート更新失敗:", e)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -92,29 +80,24 @@ def index():
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         insert_record(timestamp, note, location, image_url)
+
         return redirect('/')
 
     return render_template('index.html')
 
 @app.route('/records')
 def records():
-    records = get_all_records()
+    records = get_unchecked_records()
     html = "<h2>📋 提出一覧</h2><table border='1' cellpadding='5'><tr><th>ID</th><th>日時</th><th>住所</th><th>メモ</th><th>画像</th><th>状態</th></tr>"
     for row in records:
         id, timestamp, note, location, image_filename, checked = row
         check_button = "✅ 済" if checked else f"<a href='/check/{id}'><button>確認</button></a>"
         image_html = f"<a href='{image_filename}' target='_blank'>📷</a>" if image_filename else "-"
-
-        # ✅ 削除ボタン（スプレッドシートの行番号に対応）
-        delete_button = ""
-        if not checked:
-            delete_button = f"""
-              <form action='/delete/{id}' method='post' onsubmit="return confirm('本当に削除しますか？');" style="display:inline;">
-                <button type='submit'>🗑️ 削除</button>
-              </form>
-            """
-
-
+        delete_button = f"""
+          <form action='/delete-sheet-row/{id + 1}' method='post' onsubmit=\"return confirm('本当に削除しますか？');\">
+            <button type='submit'>🗑️ 削除</button>
+          </form>
+        """
         html += f"<tr><td>{id}</td><td>{timestamp}</td><td>{location}</td><td>{note}</td><td>{image_html}</td><td>{check_button}{delete_button}</td></tr>"
     html += "</table><br><a href='/'>← フォームに戻る</a>"
     return html
@@ -130,7 +113,7 @@ def sw():
 
 @app.route('/admin')
 def admin_page():
-    records = get_all_records()
+    records = get_unchecked_records()
     return render_template('admin.html', records=records)
 
 @app.route('/delete/<int:record_id>', methods=['POST'])
@@ -142,7 +125,6 @@ def delete_record(record_id):
     conn.close()
     return redirect('/admin')
 
-# ✅ スプレッドシートの行を削除するルート
 @app.route('/delete-sheet-row/<int:row>', methods=['POST'])
 def delete_sheet_row(row):
     worksheet.delete_rows(row)
@@ -164,7 +146,6 @@ CREATE TABLE IF NOT EXISTS records (
 conn.commit()
 conn.close()
 
-# Render対応
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=port)
