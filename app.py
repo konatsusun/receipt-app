@@ -39,15 +39,23 @@ app.jinja_env.cache = {}
 
 DB_NAME = 'records.db'
 
-# 🔹 DBにデータを追加する関数
+# 🔹 DBにデータを追加して、スプレッドシートにも記録
 def insert_record(timestamp, note, location, image_url):
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
+
+    # データベースに保存（checked = 0 は未確認）
     c.execute('INSERT INTO records (timestamp, note, location, image_filename, checked) VALUES (?, ?, ?, ?, ?)',
               (timestamp, note, location, image_url, 0))
+
+    # 保存されたレコードのIDを取得
+    record_id = c.lastrowid
+
     conn.commit()
     conn.close()
-    worksheet.append_row([timestamp, note, location, image_url or '', "❌"])
+
+    # スプレッドシートに [ID, 日時, メモ, 住所, 画像URL, 状態] の順で保存
+    worksheet.append_row([record_id, timestamp, note, location, image_url or '', "❌"])
 
 # 🔹 未確認のDBレコードのみ取得
 def get_unchecked_records():
