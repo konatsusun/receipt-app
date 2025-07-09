@@ -34,13 +34,6 @@ gc = gspread.authorize(creds)
 spreadsheet = gc.open("レシートリマインダー")
 worksheet = spreadsheet.sheet1
 
-
-# # ✅ Google Sheets 認証とシート設定
-# creds = service_account.Credentials.from_service_account_file("/etc/secrets/credentials.json")
-# gc = gspread.authorize(creds)
-# spreadsheet = gc.open("レシートリマインダー")
-# worksheet = spreadsheet.sheet1
-
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.jinja_env.cache = {}
 
@@ -89,7 +82,6 @@ def index():
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         insert_record(timestamp, note, location, image_url)
-
         return redirect('/')
 
     return render_template('index.html')
@@ -103,15 +95,16 @@ def records():
         check_button = "✅ 済" if checked else f"<a href='/check/{id}'><button>確認</button></a>"
         image_html = f"<a href='{image_filename}' target='_blank'>📷</a>" if image_filename else "-"
 
-# ✅ 🔽この部分を追記！
-        delete_button = f"""
-          <form action='/delete-sheet-row/{id + 1}' method='post' onsubmit="return confirm('本当に削除しますか？');">
-            <button type='submit'>🗑️ 削除</button>
-          </form>
-        """
-        html += f"<tr><td>{id}</td><td>{timestamp}</td><td>{location}</td><td>{note}</td><td>{image_html}</td><td>{check_button}{delete_button}</td></tr>"
+        # ✅ 削除ボタン（スプレッドシートの行番号に対応）
+        delete_button = ""
+        if not checked:
+            delete_button = f"""
+              <form action='/delete-sheet-row/{id + 1}' method='post' onsubmit="return confirm('本当に削除しますか？');">
+                <button type='submit'>🗑️ 削除</button>
+              </form>
+            """
 
-        # html += f"<tr><td>{id}</td><td>{timestamp}</td><td>{location}</td><td>{note}</td><td>{image_html}</td><td>{check_button}</td></tr>"
+        html += f"<tr><td>{id}</td><td>{timestamp}</td><td>{location}</td><td>{note}</td><td>{image_html}</td><td>{check_button}{delete_button}</td></tr>"
     html += "</table><br><a href='/'>← フォームに戻る</a>"
     return html
 
@@ -138,13 +131,11 @@ def delete_record(record_id):
     conn.close()
     return redirect('/admin')
 
-# ✅ スプレッドシートの行を削除するルートを追加
+# ✅ スプレッドシートの行を削除するルート
 @app.route('/delete-sheet-row/<int:row>', methods=['POST'])
 def delete_sheet_row(row):
     worksheet.delete_rows(row)
     return redirect('/records')
-
-
 
 # 🔧 DBテーブルを作る（なければ）
 conn = sqlite3.connect(DB_NAME)
