@@ -132,7 +132,8 @@ def records():
 @app.route('/check/<int:record_id>')
 def check(record_id):
     mark_as_checked(record_id)
-    return redirect('/records')
+    # return redirect('/records')
+    return redirect('/admin')  # ← ここを変更！
 
 @app.route('/service-worker.js')
 def sw():
