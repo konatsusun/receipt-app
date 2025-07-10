@@ -74,7 +74,24 @@ def get_unchecked_records():
 #     conn.commit()
 #     conn.close()
 
+# def mark_as_checked(record_id):
+#     # SQLiteの更新
+#     conn = sqlite3.connect(DB_NAME)
+#     c = conn.cursor()
+#     c.execute('UPDATE records SET checked = 1 WHERE id = ?', (record_id,))
+#     conn.commit()
+#     conn.close()
+
+#     # スプレッドシートの「状態」列を✅に変更
+#     records = worksheet.get_all_values()
+#     for idx, row in enumerate(records):
+#         if len(row) > 0 and row[0].isdigit() and int(row[0]) == record_id:
+#             worksheet.update_cell(idx + 1, 6, "✅")  # 6列目が「状態」
+#             break
+
 def mark_as_checked(record_id):
+    print(f"🔍 Checking record ID: {record_id}")  # ← 追加！
+
     # SQLiteの更新
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
@@ -86,6 +103,7 @@ def mark_as_checked(record_id):
     records = worksheet.get_all_values()
     for idx, row in enumerate(records):
         if len(row) > 0 and row[0].isdigit() and int(row[0]) == record_id:
+            print("✅ Updating Google Sheet cell")  # ← 追加！
             worksheet.update_cell(idx + 1, 6, "✅")  # 6列目が「状態」
             break
 
