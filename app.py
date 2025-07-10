@@ -99,13 +99,31 @@ def mark_as_checked(record_id):
     conn.commit()
     conn.close()
 
-    # スプレッドシートの「状態」列を✅に変更
+        # ✅ スプレッドシート 更新（最後に出てきた一致行に✅を入れる）
     records = worksheet.get_all_values()
+    match_row_index = None
+
     for idx, row in enumerate(records):
-        if len(row) > 0 and row[0].isdigit() and int(row[0]) == record_id:
-            print("✅ Updating Google Sheet cell")  # ← 追加！
-            worksheet.update_cell(idx + 1, 6, "✅")  # 6列目が「状態」
-            break
+        if idx == 0:
+            continue  # ヘッダー行はスキップ
+        try:
+            if row[0].isdigit() and int(row[0]) == record_id:
+                match_row_index = idx  # 上書きして最後の一致を記録
+        except Exception as e:
+            print(f"⚠️ エラー: {e}")
+
+    if match_row_index:
+        print(f"✅ Updating Google Sheet row: {match_row_index + 1}")
+        worksheet.update_cell(match_row_index + 1, 6, "✅")
+
+    # # スプレッドシートの「状態」列を✅に変更
+    # records = worksheet.get_all_values()
+    
+    # for idx, row in enumerate(records):
+    #     if len(row) > 0 and row[0].isdigit() and int(row[0]) == record_id:
+    #         print("✅ Updating Google Sheet cell")  # ← 追加！
+    #         worksheet.update_cell(idx + 1, 6, "✅")  # 6列目が「状態」
+    #         break
 
 
 @app.route('/', methods=['GET', 'POST'])
