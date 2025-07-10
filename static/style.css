@@ -1,11 +1,21 @@
-/* 全体の背景とフォント */
+/* 全体の背景とフォント
 body {
   font-family: sans-serif;
   background-color: #fff0f5;
   display: flex;
   justify-content: center;
   padding: 30px;
+} */
+
+/* 全体の背景とフォント */
+body {
+  font-family: sans-serif;
+  background: linear-gradient(to bottom right, #e0f7fa, #b3e5fc); /* 🌈 青系グラデーション */
+  display: flex;
+  justify-content: center;
+  padding: 30px;
 }
+
 
 /* 中央のカード */
 .container {
