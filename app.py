@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, redirect
 import os
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta, timezone  # ← インポート追加または置換！
 import cloudinary
 import cloudinary.uploader
 from google.oauth2 import service_account
@@ -101,16 +101,39 @@ def index():
 
         note = request.form.get('note')
         location = request.form.get('location_text')
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # ✅ JST（日本時間）で現在時刻を取得
+        JST = timezone(timedelta(hours=9))
+        timestamp = datetime.now(JST).strftime('%Y-%m-%d %H:%M:%S')
 
         insert_record(timestamp, note, location, image_url)
 
-        # 送信成功後
-        return redirect('/done')
-
-        # return redirect('/')
+        return redirect('/done')  # 送信完了画面へ
 
     return render_template('index.html')
+
+
+# @app.route('/', methods=['GET', 'POST'])
+# def index():
+#     if request.method == 'POST':
+#         file = request.files.get('receipt')
+#         image_url = None
+#         if file and file.filename:
+#             result = cloudinary.uploader.upload(file)
+#             image_url = result['secure_url']
+
+#         note = request.form.get('note')
+#         location = request.form.get('location_text')
+#         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+#         insert_record(timestamp, note, location, image_url)
+
+#         # 送信成功後
+#         return redirect('/done')
+
+#         # return redirect('/')
+
+#     return render_template('index.html')
 
 @app.route('/records')
 def records():
