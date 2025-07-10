@@ -23,31 +23,33 @@
 </head>
 <body>
 
-  <h1>📸 領収書の提出</h1>
+  <h1>📸 領収書を提出</h1>
 
-  <input type="file" id="receiptInput" required>
-  <button id="submitBtn">送信</button>
+  <!-- ✅ ファイル + メモ + 位置情報を送信 -->
+  <form id="uploadForm" method="POST" action="/" enctype="multipart/form-data" onsubmit="showSuccessMessage()">
+    <label>📷 ファイル選択：</label><br>
+    <input type="file" name="receipt" required><br><br>
 
+    <label>📝 メモ：</label><br>
+    <input type="text" name="note" placeholder="用途や金額など" required><br><br>
+
+    <label>📍 位置情報：</label><br>
+    <input type="text" name="location_text" placeholder="場所など" required><br><br>
+
+    <button type="submit">送信</button>
+  </form>
+
+  <!-- ✅ ポップアップ表示 -->
   <div id="successMessage">✅ 送信が完了しました！</div>
 
   <script>
-    document.getElementById("submitBtn").addEventListener("click", function () {
-      const fileInput = document.getElementById("receiptInput");
-      if (!fileInput.value) {
-        alert("ファイルを選択してください");
-        return;
-      }
-
-      // フェイク送信処理
-      setTimeout(function () {
-        const msg = document.getElementById("successMessage");
-        msg.style.display = "block";
-
-        setTimeout(function () {
-          msg.style.display = "none";
-        }, 2000);
-      }, 500);
-    });
+    function showSuccessMessage() {
+      const msg = document.getElementById("successMessage");
+      msg.style.display = "block";
+      setTimeout(() => {
+        msg.style.display = "none";
+      }, 2000);
+    }
   </script>
 
 </body>
