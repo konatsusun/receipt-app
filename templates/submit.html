@@ -23,33 +23,46 @@
 </head>
 <body>
 
-  <h1>📸 領収書を提出</h1>
+  <h1>📸 領収書の提出</h1>
 
-  <!-- ✅ ファイル + メモ + 位置情報を送信 -->
-  <form id="uploadForm" method="POST" action="/" enctype="multipart/form-data" onsubmit="showSuccessMessage()">
-    <label>📷 ファイル選択：</label><br>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <label>📷 ファイル:</label><br>
     <input type="file" name="receipt" required><br><br>
 
-    <label>📝 メモ：</label><br>
-    <input type="text" name="note" placeholder="用途や金額など" required><br><br>
+    <label>📝 メモ:</label><br>
+    <input type="text" name="note" required><br><br>
 
-    <label>📍 位置情報：</label><br>
-    <input type="text" name="location_text" placeholder="場所など" required><br><br>
+    <label>📍 位置情報:</label><br>
+    <input type="text" name="location_text" required><br><br>
 
     <button type="submit">送信</button>
   </form>
 
-  <!-- ✅ ポップアップ表示 -->
   <div id="successMessage">✅ 送信が完了しました！</div>
 
   <script>
-    function showSuccessMessage() {
-      const msg = document.getElementById("successMessage");
-      msg.style.display = "block";
-      setTimeout(() => {
-        msg.style.display = "none";
-      }, 2000);
-    }
+    document.getElementById("uploadForm").addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const form = event.target;
+      const formData = new FormData(form);
+
+      const response = await fetch("/", {
+        method: "POST",
+        body: formData
+      });
+
+      if (response.redirected) {
+        const msg = document.getElementById("successMessage");
+        msg.style.display = "block";
+        setTimeout(() => {
+          msg.style.display = "none";
+        }, 2000);
+
+        // オプション：トップページに戻る場合は下記を有効に
+        // window.location.href = response.url;
+      }
+    });
   </script>
 
 </body>
