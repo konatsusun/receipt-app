@@ -179,10 +179,10 @@ def done():
     return render_template("done.html")
 
 
-#送信後に完了表示ファイルを読み込み 
-@app.route("/submit")
-def submit():
-    return render_template("submit.html")
+# #送信後に完了表示ファイルを読み込み 
+# @app.route("/submit")
+# def submit():
+#     return render_template("submit.html")
 
 
 if __name__ == "__main__":
